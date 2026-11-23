@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Antify System Widget – CPU and RAM on your Windows desktop</title>
+<meta name="description" content="Antify System Widget shows your CPU and RAM usage on the desktop. 129 KB, works fully offline, no admin rights needed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#060d14;--surface:#0b1823;--line:#17303f;--text:#e9f4f2;--muted:#8fb0b3;--accent:#2fe0b0;--accent-ink:#04201a;--glow:rgba(47,224,176,.26);
+--display:'Sora','Segoe UI',system-ui,sans-serif;--body:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f1f8f7;--surface:#fff;--line:#cfe3df;--text:#0a2230;--muted:#4b6a72;--accent:#0b7a62;--accent-ink:#fff;--glow:rgba(11,122,98,.16);color-scheme:light}}
+:root[data-theme="light"]{--bg:#f1f8f7;--surface:#fff;--line:#cfe3df;--text:#0a2230;--muted:#4b6a72;--accent:#0b7a62;--accent-ink:#fff;--glow:rgba(11,122,98,.16);color-scheme:light}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:400 1.0625rem/1.65 var(--body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{width:min(1080px,100% - 2.5rem);margin-inline:auto}
+header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0}
+.mark{font:700 1.05rem/1 var(--display);letter-spacing:.01em;text-decoration:none}
+nav{display:flex;gap:1.5rem;font-size:.95rem}
+nav a{text-decoration:none;color:var(--muted)}nav a:hover{color:var(--text)}
+.hero{background:radial-gradient(800px 360px at 85% 0%,var(--glow),transparent 70%);padding:3.5rem 0 0}
+h1{font:700 clamp(1.8rem,4.8vw,3.2rem)/1.12 var(--display);margin:0 0 1.25rem;max-width:16ch}
+.lede{max-width:52ch;color:var(--muted);font-size:1.15rem;margin:0 0 2rem}
+.cta{display:flex;flex-wrap:wrap;align-items:center;gap:1rem 1.5rem}
+.btn{display:inline-flex;align-items:center;gap:.65rem;background:var(--accent);color:var(--accent-ink);font-weight:700;text-decoration:none;padding:.95rem 1.6rem;border-radius:999px;transition:transform .15s;box-shadow:0 4px 14px var(--glow)}
+.btn:hover{transform:translateY(-2px)}
+.cta small{color:var(--muted)}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:3rem;align-items:center;padding-bottom:4.5rem}
+.stage{margin:0;position:relative;display:grid;place-items:center;min-height:300px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:radial-gradient(520px 280px at 25% 15%,#2a2f6e,transparent 70%),radial-gradient(460px 260px at 85% 95%,#4a1f3f,transparent 70%),#0d1024}
+.card{display:flex;gap:clamp(1.2rem,4vw,2.2rem);padding:1.6rem clamp(1.4rem,4vw,2.4rem);border-radius:24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(8px);color:#eef2ff}
+.gauge{display:grid;justify-items:center;gap:.55rem}
+.ringbox{position:relative;display:grid;place-items:center}
+.ring{--p:0%;--c:#5b9bff;width:clamp(92px,15vw,124px);aspect-ratio:1;border-radius:50%;background:conic-gradient(var(--c) var(--p),rgba(255,255,255,.14) 0);-webkit-mask:radial-gradient(farthest-side,transparent 74%,#000 76%);mask:radial-gradient(farthest-side,transparent 74%,#000 76%)}
+.ringbox b{position:absolute;font:300 clamp(1.7rem,4vw,2.3rem)/1 var(--display)}
+.gauge small{font-size:.8rem;letter-spacing:.04em;color:#9aa4c8}
+.stage figcaption{position:absolute;right:1rem;bottom:.7rem;font-size:.8rem;color:#9aa4c8}
+.custom{display:grid;grid-template-columns:minmax(0,430px) 1fr;gap:3.5rem;align-items:start}
+.panel{margin:0;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.panel img{display:block;width:100%;height:auto}
+@media (max-width:820px){.custom{grid-template-columns:1fr;gap:2.5rem}.panel{max-width:430px}}
+@media (max-width:820px){.hero-grid{grid-template-columns:1fr;gap:2.5rem}}
+pre{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:1rem 1.2rem;overflow-x:auto}
+pre code{word-break:normal;white-space:pre}
+section{padding:5rem 0}
+h2{font:700 clamp(1.3rem,2.8vw,1.8rem)/1.25 var(--display);margin:0 0 2rem}
+.facts,.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:2rem 2.5rem;align-items:start}
+.facts h3,.feat h3{margin:0 0 .4rem;font-size:1.12rem}
+.facts p,.feat p{margin:0;color:var(--muted)}
+.facts b{display:block;font:700 1.9rem/1.1 var(--display);color:var(--accent);margin-bottom:.8rem}
+.hl{padding:1.4rem 1.5rem;border:1px solid var(--accent);border-radius:14px}
+.alt{background:var(--surface);border-block:1px solid var(--line)}
+.steps{margin:0;padding:0;list-style:none;display:grid;gap:1.5rem;counter-reset:s;max-width:640px}
+.steps li{counter-increment:s;padding-left:3.2rem;position:relative}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:2.2rem;height:2.2rem;border-radius:50%;border:1px solid var(--accent);display:grid;place-items:center;font-weight:700;color:var(--accent)}
+.steps strong{display:block}.steps span{color:var(--muted)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:480px}
+th,td{text-align:left;padding:.9rem 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{width:11rem;font-weight:500;color:var(--muted)}
+code{font:.85rem/1.5 ui-monospace,Consolas,monospace;word-break:break-all}
+.note{margin:1.5rem 0 0;color:var(--muted);max-width:60ch}
+.credit{max-width:60ch}.credit p{color:var(--muted);margin:0}
+footer{padding:2rem 0 3rem;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 2rem}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="wrap">
+    <header>
+      <a class="mark" href="#top">Antify System Widget</a>
+      <nav aria-label="Primary"><a href="#about">About</a><a href="#features">Features</a><a href="#install">Install</a><a href="#details">Verify</a></nav>
+    </header>
+    <main id="top" class="hero-grid">
+      <div class="copy">
+      <h1>CPU and RAM, on your desktop.</h1>
+      <p class="lede">Antify System Widget shows your CPU and memory usage on the desktop at a glance. It works fully offline and needs no admin rights.</p>
+      <div class="cta">
+        <a class="btn" href="https://github.com/FreakNgo/Antifytrack/raw/main/AntifySystemWidget.exe" download="AntifySystemWidget.exe"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M1 3.5 10.2 2.2v8.6H1zM11.4 2l11.6-1.7v10.5H11.4zM1 12h9.2v8.6L1 19.4zM11.4 12H23v11.7l-11.6-1.6z"/></svg>Download for Windows</a>
+        <small>64-bit Windows, 129 KB, no admin rights</small>
+      </div>
+      </div>
+      <figure class="stage" aria-label="The Rings theme showing CPU at 37 percent and RAM at 71 percent">
+        <div class="card">
+          <div class="gauge"><div class="ringbox"><div class="ring" style="--p:37%;--c:#5b9bff"></div><b>37</b></div><small>CPU</small></div>
+          <div class="gauge"><div class="ringbox"><div class="ring" style="--p:71%;--c:#ffa94d"></div><b>71</b></div><small>RAM</small></div>
+        </div>
+        <figcaption>The Rings theme</figcaption>
+      </figure>
+    </main>
+  </div>
+</div>
+
+<section id="about">
+  <div class="wrap">
+    <h2>Light on your PC and your privacy</h2>
+    <div class="facts">
+      <div class="hl"><b>Offline</b><h3>No network, no data collection</h3><p>The app’s own notice says it has no network access and collects no data. It only reads CPU and memory load from Windows.</p></div>
+      <div class="hl"><b>No admin</b><h3>Installs as you</h3><p>No administrator rights are needed, and settings are saved for your account only.</p></div>
+      <div><b>129 KB</b><h3>One small file</h3><p>A single file is both the installer and the app.</p></div>
+      <div><b>64-bit</b><h3>Built for modern Windows</h3><p>A native 64-bit program for Windows PCs.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="alt">
+  <div class="wrap">
+    <h2>Make it yours</h2>
+    <div class="custom">
+      <figure class="panel"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAa4AAAJyCAMAAACrP9RhAAABgFBMVEX//////9X//7bP//75+fnw8PDn6ur96L3j4+Th4ePh4eHh4aP50o3/vj/yunbW1te66P3IyLqS2/udytV41vTwtHStra2msa/cnGKudIx2qN96eYhCkdQ8eP8AeNdEdNjhYll5UlBWTWBEN0okR3UwLj4/Ijs+IjszIjg8ITo7ITo6ITo5ITo7ISs4ITo4IDk3IDk4ITA2IDk1IDk0IDk1ICYzIDkyIDkuITYtITUhIDMyHzcwHzYvHSVmADFGACcqHjMpHjIqHTcpHjAqGDIpFzEnHC0mGi4oFzEnFzEmFzElFzIlFzEgHDEfGjAiHCMfGi0kFzEjFzEeGSYjFjAiFjAhFjAgFjAfFjAfFiUfFS8eFS8dFS8cGiYbGCwbFjAcFS8bFS8bFioaFysYFykaFS8ZFSkXFSgYFC4WFC4XFCkWFCgUFC4VFCMTFCwUEyYTEywSEy0REy0QEy0PEy0SEigOEiwAAEwVEyUTEiUSEiQRERoQESEMCRUHAAcAAADo5wMIAAAvTElEQVR42u2diX/bRpbnoTuRGfEQDwhASwRA2O6ZXLPdcSwmkXzM2DvbTVtxJ51Md4dJbMVy4mjdu52N3CI9/Ne3TqAAFEAcBERK7/exiaOAAlhfvlcPVYWSooAWRx9BEQAuEOAC+XGtvcW0BuUyp3rPg6U7fS5rHUpmznHpfUEWlMx8O8O1vk9VKJrZqeoqydETdlR1EoPrrf6AaGjb6LNf5/u7u/4TKocNpTXprbg7WpPJWS3BXXSbirJ80EAn7OI8FLZ1JXCFVmKP/u+qsIjENcQa2PX6DlpwXJWe6ZUpK9/lg6aA70ZNqYjFHgWhtYtZG4qiGhFHXlp86XBRUFJaAq4jBOv4+Miut3eOh0OOSzXc0hVwCcXaEgwtttAr6EBV31OWXP6AK5qXnJaAC7HqG0Yf43p1zHGhssXFvHygTybG8sFksrt8sI0WhtlkpJYPDHwY2Vw3JxMNH4TMCHnI5YPO4aSpoqNZVkvm9gHaW8Nc0BGGb3F2jZwJuAgvOS0P19vHxye9ZtOyq+2d0+PjumsS2BqWD3aV1hkpZvQfL7Br6zYphkmTbeJPhR2ktBDe3koLsWrRuq3bXLZWug10EMmjqahn3oIevzjWNXFVKq73PFynpxzX+JTjwp5Q3VUETu6ihgqfRx9NukmqJmY6xBAbLjxSeSFSxLmiHdRm3YV7PFhXrDP049I0y2639fHpaZ3VJvj34zMrtvBVauou31QnTYLrRk2wM4ah0lObNHQJ43KPB1zJQo23T8/PES77Y4zrnOEitROqmCS4eMiIosIl03A3VYMeZIRxLZlneB15RokzNABXqkB+7XQ8HjsO+m+jlVN6aNegxsMLvUs8Fi1W9kC2zAIEvEkfwbo01Ag5Q0XF8PFxpKqakBiDLcjx5Ex4TI57TPYaoazxaDTm/+1kj73RmylEPSEoVSOUsm6PXNmb0wvZ/7xVCT5+JVc3+6lXGBeyvjrTdJsl9VDkZnKhp4BkTViggDMEAS4Q4AJcoMULNUBgXSDABc4QBNYFAlyACwR1Fwis64rrOhQBWBcI6i6QojyGIlgkfQZFANYFAlwgwAW4QIALBLguO65VKLA5xbXmjul1x/bC7CjzimtNt/shORZM3zCXuKpOX642lNj84VqPotX35tsAzQ0uPZLWwIYimzdca84gkhfMPjR3uOrRsPoDHcps/nANRPWPx+fnQ7IPcM07rkeD/23rptk/RmuD/iPANX+4Bo88DY5t/Iy8c2+INvrDDLgqh3SGNvJm68XMxcBvgQjdx6K+Di3FNRgMPQ3GenWnvlO1ztFeKS6MwZheVuiwM7MnxbVlkvl6ZjFNQ3cyoXMQeHNRod/Ipcb16IijGmBcZrVdb9ftMdo7kOFqoZKWfv+tj0RjakVBJVZnWWYkLn8+8Wox6jhTsrJ8ELy5abjSXG4ecHHDOj09PR4eIetCuKr2GO05OtalP2j+k/ZLnQRwyefeQHagxd6kmsKHIjpkKgE8sQpZaYWsdhoudbJouI6xTnu9Xv8UO8N2m+A6PpbhInPcSS0jIa7utLkaUpVflx6s8t9QN3TZS4lriCdgazadExHXUIILfbsaL3FcR+B6qLdNfSRxk2gnnXYIb5msLAR4Hq6umEgqtLO9FTcflP17aKWv0SN6H6FkbQnbdj/sc4nJG7TqqinkFnDiRxNyIsFFNqz36IabtXC5RcGFbeukj2k1tVMX17EU15JJYRgMF0ZyiIv9rTYqKaO9TctqqY3r/vY2K01aim4B92piUZNEdHjPwnbg5qOwXRM6/RSq7z4iBWsdiuZA6yr8SVYoKIaLZ0BgdMUNL2vvcouCi7rCvhbGdfxKl9TtTde/YFxNt75gXoWVFbUndiTnyyuvyd664ksUPZaXj8G36GxheP4wdJQviCGRILkYsVWVXJXegntb7CRvQ8x64ZwhMq0TD9eI4RrhvWFc1JXRUuFkWFnLcEmLZAP/yPdWxEQJrq4bRBi8sGnF5A/+yK3gYwlF6l/pLbAM6OHM8bobbtYLiOv09AThQsK4LI4LBYrnejjQ2PUtBFcnxUVdYzBq36CP0EIi/tlvrwi4lkx3QlWDG5SbIuDCeRAI6GOXkeT58sd1PGetf8PLeuFwIdNCGmhEHq4TGS7V/aLsVzwNF//hB6PErUM6GaKbSCIBbHIClE6bqBaHC1/8GrkPlBl7WCa3sHzgPpJRlorIzs164XBhWKdjhmv0huM6leDCjzkWFm3ZSIKLVSs1yeNX05+4weZjk0CJwUV/QdSpshUXl2dQvg1/BouJaxjA9Ybs1UOBhiEEZElwoSP7h5IGDpIeSKTneHVXIwkuGp6usBVeKe260ShpkfJt+LJeQFzn5+enox6m1RuNPtaq1erO6RjvDOLyviep9ZPgIj96oUCWTKvmRnRu4lJ1PYirRSEs7egrsbjIhM/sNliTBr0F6hnxkxr+EwTihpj1AuIaI43Glq7bo/H5G0fX9eHoHM/RG8AlNJ22Jt7zF8OFC8HSV4K46MS7gSZD9KzGa5nJLrPWjn5InshYPvgX0dfNQyF2l+Iij8hN/sNoerjwlXrWe9T2fBti1u7lFgTX2tFoTPQGiYBDS7rrdFwP1jeGUIs1/LgUFZd9CBcuqKYvKsRBxVlvW0xc6h7SRg3FzYdFH2f4ES0Wl/tXdNwV/oCBMz0zaEMG3dDfE5o4SNbe5RYDl2KNxngG5THTiH+i3c4MBvKKLRrpEgvQ8sEiTa8txVU9RWAkQsBmMdCwchjTPRabWIDKvl4BuJT2+I1rW55Gb0Yz6fqPbYHvlmtcS+b8xhWJcSl1B9dXAY2cGdiWasX0Pccmztys+laHBzgLjgsB00Oqz+IFFBX3emRKnHWlZZIunV5NuQy4QIALBLgAFwhwgQAX4AIBLhDgAlwgwAUCXIALBLhAgAtwgQAXqHBcbeuyyFxwJcJl/fts9B+C/meE/jNK/ytKf4zQ52F9en22upFEv02if4nQv/pVGq7/uHBWn3/+h8VmVRqueWA1W+O6CFbl4JoTVp8/efLBYrMqAdf8sHry5A8Lzupf3323UFzzxArp0zli9S8ZWL1bJK45Y4X04YKzKg5XMaz+mIPVkydfFM7qt8WyKgjXXLL64ov/XHRWReCaU1ZIny46q5njml9WSJ/MZRiYgtVscSVBdWGskD5YdFZSXJ9lwjXvrL788ssbi85Kiuuj9LgWgNWXX36+GKzejVV+XAWzuuc49kw0i/4XnM/1C2OVH1fhrFD5OM7tO4P86t/OrZv4p4OgXb8YVjlxFe0D7yJU+4NZ6e7tGekmNrGLYJUn1Ci+vnJsZzBDZca1H5Zj2TfKZ5UZVwmxxb/PFlZWXPsRijSwAlllc4a5WCVtur03a1pZcO3HyJHxKpZVBlylsMK07g0uGNf+FN0M8iqc1bvvvp/KGZbECnvCO4MLxbWfQD5exbN6Hys5rtJYIdm3B7PXTFlRXjdKZZUcV5msUEwYVW89yqFBJiT78fVXqawS4yqT1R8/v2snYtXft3s9JwuuKUbjWKZpJ+JlXy+T1fvvf5AKVxmskGRBYaDkScOU0aR/NcJIBm1/KqvbpNHCUreIVHUqNMcukxVSsg6UEll9/vk9O5ZVn7chWk1Pmm4nwhVrVKxZ0dzyNI2Ybc+gmT0pq+S4imfltasHaq6AB/TabPWmT1pvCq678WGDN45+yyfVTG5exbKS4pI5w/JYYV/Yj6yv+r7Wec3Pq2nEW9ggESyk1lYAWIyFWb8tj9UHH3yYHVdRQ848Xxgq70BXimUYhh+Z4WTBddvfuWJbO6raSgiMe8MyWCFlxFXg8EDmC8PFfUcg5dz2DugJzGI94nTTwhm7+80dj1nLjPOGJbGS4no8FVexQzkxLllh3/ZY7QfTbN0ltheN6468wAVWIdsxVQ5sJwpXMaw+kLDKgKv4Ybf2vrSsXUfoyB+WexyY0U8Va9guLHnY6AJTb0pS79y0ymOVFlcpQ6SluAZTYGExC9M0J3nl5VZbdnSMbxKf2GqFKrA7SPtWeaxS4SprOLstsw5Oqx8X+vUNQiua150o27Jvxgb5KqaFeN0IsMKyymOVHFeJrx7Y0Z7QmdZoqBNamhHFM4rWtMYms0WkBlmFcBXKKjGuEl8TeWIfhcSiDOdoqnr0T1bthVPwX31+FChuFmXYd6aK8doJp1jlsfrww/+RHVchrJ588UUYF2vJuH2UQDbl1QuzwrrvMw0WwTt3EsimvMxIXCWwQsqIqyhWX0hwDRLblmBfdpgVMS+hoFmYYd9JJGZfthRXOawy4iqQlQyXk4YW52WEWWHdFQ0mDS3OSw3jKo1VFlyFD5G25cb1KCmuI8N1h8OQHgWNy95PiuuOKnWHVnmsUuMqYzi7LTWuQWJaR33qDodS3fUbl307Ma07N1WZeVnlsUqHq6RXD2xZnOEMU4i6w5407cgt/HSu0HOH3LzuUlm5WX2YlFUKXCWxCuOixnWUBhf7A7R9adpDn3HdSSVqXjc9VslxzYJVYlylsQrhGqQ3rkTmdTt5DB8yr7uirPJY5cJVCCs/LlS6WYxrOCTRxp48beA9Iac0Lm5e6XDNjtXvfve7jLiKYiXgooWbxbi4eQ1joo0svvDOXTMtrpmyyoirQFYcl2sKBNedtLj6Md6QuEPqC2+mYoV0M+wNrfJYZcGVmtWTNKwwLrFoaWthsMAdS9eJxVn8ryoGj9iL8Yb44Yv62NAjL8+Obtl+VljEG+4kwVUAq9S4Cmf15Zd/9sFxZL7Qrut6W7E8XO328xTe8Nmz+2wcQQSudvsB8pboCvf9rJDC3tAqlNXvAkqBqwxWSD5cpFTvhgr89fPntvIUrT19jtW2T6XesC9jhTS8T/IN+8L7D7Da1pHd3rTa9n0/K6R3iTd8NxZXYaxS4CqJlRSXPC5suwda7ZOn0kcvR8YK60hqXNzG6kf3bevoT23r/t2QiDe0o3EVySoxrtJYBXANpFUXVX3w1AX3Wh7K96SskB7F4apbKBi5fx8to3CZEbgKZpUPVxGsArj60bis9mtvLWRcNNboSVkh9WNwWe2j+8QHpsRVPKvf//73WXEVxCoZLhQStPXnJ65xnQzluHQpqym46tZDCkKKa0eK6/1SWGXFVRyrAK59+UMyxlW3GQYbGVcYiE4i+WcRIvna92Wy6396QNfq1oNwMgkNd4QdVnmsMuGaGas/y2UHH7skbRpPT05sxaZF37ZeS4D0YnHdjsbVtv50fxquroirPFbpcRXN6s9//irkDB15OG7pxKj6ysnJswjr0qNw0XxltG4qDx9OxWXKcBXPKiWutE1MGVghTa27nnEnSDBZ7VMZEBpqxOKyjyS4rPZ/3Y/DpcpxlcIqDa5yWAVwhQN5r8gt/TX1hSfpcdF8nx3JfOHD1LjKYpUYV2msAriGflyssB1iXIpDOCmvj2VAyHOXHYXrGcUl4aUcPZiOS6z1rPJY5cNVBCuMK1Ssj8jqU1ebbdJmOMbrdn38VKJHtFXD3X4ekG1ubZmPnj8fBojY1f8SDC0K13UZruJZ3bp1KyuuglhJcTkiKywUyFuD8QledaxTGS7axBvBCom80GqilWd+JLbl4bKcB/JIQ70fwpWrmT0pq6y4imMVxEU7OkI0TpDcdRku2oESwYrjUvHas4c+Hg+EzYcJcZXFKhOuQlkFcdEQ7tHTtKLdkxGssDMkr2ztS3jFKxRp3LfKY5UeV9GsvvrqaxEXqpvI6Pi0tBzaf/I8Wi3uDZGOEtOy6VCoqbiKYSXF9VkkrhJYIdkeK1zwpPJKi4v6whhagjdMwyvsCyW4CmOVxrrKYYVx+cID6g3j7EQialx63CHUG9ps69nDB9P18OF16gsfirLKY5UY1yyabhOxorh85UqUDhcxLu1e7DGqa144bjk5msoKiRrX9UhcBbNKj6toVhiXv1gzmBc1rr34g+jcNOYJV5yBMTL0HS+/cXm4imd16+OP0+AqgdVf/vKXoCWlN68kxsXN68jldXwUywpJlRgXw5Wa1e8zsPo4Ba5yWElwsXcaktNiQ66nHRY0L6lDFMGYMuPCuMpilRhXaawkuJh5JXaH7HXXR7EHYTpqiFfAIfq52NS49oO4ymOVHlfRrDCunwJi7+MNfkok9nZXL+aQl1Q2nS/Dfilo+DBK11WpcUXgKoTVx598kgZXMaxEVH/561//GsL1E3vxf5iEFqu49qaxwjLJ7CZ+XidHclr7lJb6MAGuolh9kgJXOaykuH5yEtvXkLrCvUdTWWGpW/T1cN/O5zJaNxit/am4CmSVGFdqVl9lZCXH9Zzx6k+jNbAt2nOSgBXSkcqmX/DvfhpiYjNaNx7G4yqWlRTXZ4lxFcBKjuunIZ8Rakq9hQ7Zk1dcL6W6Kef1U8AjmoyW/TAOV+Gs8uAqhlUELh5u2E6MgbFX93TdScYKy2G8VL9DfPn8KBRktFTzYTSumbH6OJpVZlyFsYrCxVngeaF+ij8gWMW9jNV9xqK1c1MO7Aab/0RuWxRXSayy4SqSFcZ1ItVzb0LDR+HUoTs5pTM8SaUHnFfIwnAzx3WTJ6s35I0eVnmsMuAqmFU0rpOTfWFu176Y8Ej4e4fO83S0Tl4Ouflgd2cOBV62ywrHhBEtVFZ5rNLiKp7V3/72t0hcJ755rh3Hud3v377t/9OU+ylZUSweFcQFMcNSVWGvaka2JlrlsUoVyJfCKhYXAhb/10BvP0vPirRlmK04qea/RTcmWuWxSm5dM2P113hWU3CdPN+PhpWq1gpGHKYaScv8t4cxDb9WeawSW1dprKbhOjl51pf+YV5nf5iZFQ0s5MCQZeEH56Oohl8BV+GsEltXaax8uKKC75MgMaf/7GVivYrUA3NHDbDa52mSpg4frjJYZbauwlh5uKYU+tGgv7/vOPv7/cHRy1mwYtq3UZjRxeGGfT2Q9PQoCldJrLLhKpIVw/WyEL3KK5mJWblYfZJSaXEVzArjmlNWVM+fJsNVBKu0uIpn9bfvvrPnl5WMmFUeq1S4SmH1XQG4Xs1eAjErfzP77HEVz+o7Lvu1X7Mr5H/OUics8rDKY5UYV2msiHXNPyuql5iYVR6rTz75NDuuQlhhXMOFYEX16if709JYIWXEVRQrjGuwKKywju2fXzy592kprKS4PpuKq0BWSE5/OivHspy+ZVn9V30LbaJlflY4Pwev2PjTtobkc9pZj5yfsX54cu+TwlllwPV1sawwrv2p9qLrqGSdjmV1+k7n/NWrjjMDuyL5IVL7Hf38n//UO/b5P4edzjj+pP83oLiwXnz9B49ZEazSOsPiWX33/ff3nNdTZOnj8fm50xmd6zb6fP2645yThFxuDeU01q3zc8vSnfNzXdfH57aOrhEv597PPmFmnxbEKhWuUlghfWsfT8Gl22P0iUGJuPLVQRg/AnU0Pu8MbARNx9B0eyou+9ufw/rx28G9e7NnlRxXWaywcOUVj8s5JbiQ8zrhuHKyOie4Ovb4nGaLcNmWozvTcA2dnyP14tuvnty7N0NWiXGVx+r7BN7Q0hku+3jU7xy9Hnb65zlZEVwos/45rhd1G+E67uD6cZTOF7r6u6sfv/16kJZaCNPte/cGX7/4+Zd0uIpnhWUfxeMaslADFSUyNeS29FFeVhTXuaUj9OOxraNabGx1xtNwndg/xrP6+9//D9fPP/zw7WCAyN1Lygodik548eLFP4h+QUqBqxxWSP2pwYZtWYO+NSL1lW3Z43FeVkgov/OhhT/R6th2xvvOiGzFGVc/IaugXvxANQjp2xdU//DrF6owG1uKqzRWiWqv16ioXv+TQTofn+dmRTQm/8fn7mJM96WouRKx+r9R+keEfnElYSPZlXgY0wxYff/DD1/bxzNpcjgvVq+cb0tl9csvv4bZ6DG4ymBFfIRzMu+sgq6wBFZIKXCVxQqrn5PX+XmptHKx+kdSVilwlckK655zPNeskCfsl80qMa6SWRH7so/ml9X5+TGjVSarXLiKZIX1teMM55TV+UuHRBkls8qOq2hW1CHazjBFGY7L0nHf7l8Eq4y4SmFFdBv/eevhPLE6Hu47jnMxrLLgSs3q+6ysqEsMvBF00XKce99eFKvUuEpm9SKXfozQz7l0gazS4QJWF8wqBa5FYvXjJWWVGBewmgdW+XABq5JZ5cAFrHI13WZilRUXsLoQVplwAauLYpUe15Vh9fc5ZJUSF7C6WFZpcAGrC2eVGBewmgdW+XABq5JZ5cAFrFIPjcnNKisuYHUhrJLiAs2vABfgAgEuEOACXCDABQJcgAsEuECAC3CBABdIlAVFALhABekxFAHgilAblEoXjWsTlEKAC3ABLsAFAlyAC3BdOK7uBMs4aBSC69ohylzb3DrUgMeMrGsZoVouCteBtqmebQOMxcGF/4PkiIRFOlydw4mhKJXDyVmNbDTVibsjp3X1qmhx7cBEGW4ivzjpHWjVA+wjr7qqFgVlVVPj6q20MKiG0jLIBmLl7shXd/UItWuHPewWr6FarPurpvbAtDgvSiu1M0T/Kzgy2A3tyGVdW7e2CS7qFrd6VbI4NAAW5cVoZcJ1oybbkc8Zdo0wrs3NLjhDyovRyoJr+cCQ7cgdani4mDNESV2wL8KrupkZF44sfM6Q7siHa7Pb83BtoggGhRroE8L7BWnVwLUZaGFwmb0q0FkMXPiBC9wgNPECLsAFuEDzigu0SCOhQDAsFHCBABcIcAEuEOACAS7ABQJcIMAFuECACwS4ABcIcIEAF+ACAS4Q4FJ2PQEuwAW4ABfgAlyAC3ABroXGVc0pAVd1vlUWrtZkclarHDaKwbWeTwKu9blWMlwtPOlFi8yAQT+R1MmkqSjdZjJc+GXxSqMw6wJcnpbM3kFNWT6okZe+a3TqmWVrBf2r7CW0rlZvBZxhWc4QQVJaqBZWDfrJca2btYS43Jf9VTKDRo5ZaiDUSIQLQ2rt0k/uDNVm4rpryUS+kxgmM9CWAbhKxEUtLEVkWDlsElyousszSw3gyoqr26DxRsJAXiVTaeCz88xSA7iy1F3YXPZIBZYsMmwgd2jQWIXXZPMjzaWlXRZcyCLo7E18UsIls5Yc1/IB9n7oVDxtaG8lxyw1hfK6FLQILvzE1eSfxLcZ/OFr4RuhOK/LQevStxkyXleT1mJ2/mtXlRaM1QBcIMAFAlyACwS4QIALcIEAFwhwAS4Q4AIBLsAFAlwgwAW4QIALBLgAF0hUwaNWARfgAlyAC3ABLsAFuC4Trurl1kXgak34S+hB5Z8PoLp+qZUBV+jl/3Rv/qPzyRteEbnzl5AA10xwhV/+T/nm/5KJuUa+NZkXFzjDUIH6X6BM+eY/BbVkItidQ2ycXfI+3pKJbHT5YPtgMulhoMXO53CFQo3Q68np3vyvEA7IxpYP8LuTDWpR1DsSi6UvLXebAKcYXEqqN/8F66Iv/+NJhxp0L8OFnawFxlUcrhRv/rt1FwaDNtAaYufDhbJXDWAzO1yBl//TvPlPIkv8wj/+jyi1iEv0OUPkMM0GsJEow8QE4Zf/U735T5+7mjgfHF3gGAPDwRMCkMlRujjw6O4CmlheyV/HDb/8n+3N/7iQHQKNeF4FvTydEVcFovhYXkW96p4J15J5BjVXHK/CJib4DEp3kfQRFAHgAgEuENRdgAtUnGCsBuACAS4Q4AJcIMAFgkAecIEAFwhwAS4Q4AIBroVVmf1ddWsUlt2+fIW6NiNdJK5VHcFxLF2U5aB91vqlw9WeiS4S16o9GunhG1htPx49rl46XJsz0IXi0kdOXVE26x1R9c1VZd0a2avkkM1qXfht1aubq8L5m23d8qS3/YnVULZCYr2temoHE3dEBRK3NVHbvsTLjWv0uK6sdTStSbRNhYp2XVl1Rjr+jvXqulgcq+vVuusm1/THb94INR7a0L3EbZarK23bS2yr7/ilqkJiN6gdL1Hb2/uNqL09bf3K4NKVdbdUt111Om8p9dFjZGR1iafkvNbtN+EgxdlkiUFYBNhbLDEIiwDjiV2ZeKKfFSP21sXiKi2QH60qnTCtbeQcVxVnVFXqMkezyvbqElooRqGJ202Ztmli+x2ZVJq4I8W1QxO138ikrV4NXLayqUlo1eudqmKN2pvycOMtsntzJNWbOknUpLia9ExViusdmtiVi2a7J8W1V70auHSlrslooegChSF6VV4rrJGia7+R49LJ05ycVnObJMppvUMe9uoRuEjithzXbzpXBVdHSgvxwrjqEU6mTaNKucj7ap0IXKRcI4zrHTXaFyJvGO0LkTecP1z4JX/3jaCcEzMEcYVoUVxRbRtkv7XAuKp4poRqkbgqh03yx66LwBWmdblxbR1q6EMTMVw70GaJi75K7mqmuCS0LjWuqgTNjHG589Xgv0feJLi8NfIuuXlWy4ZLRutS49q6te0iQv+xZ9RRWfaQ1U0meBfa0rqTiZH9MZm/yLp80MRTdhFAfI3iMjJal5TWtUuNi1VbDJfa4+vIRyI/ee2wV1URK/VsO7d1kWW3SScQYGvuTA1ZcMlpXbtC1rV1aNB1st/U2G65f0xZdxWIS6R17SrUXS6T7kSbMS6lNSGRIXGBN2rcGeK5a5p48rz8uHy0Kpc6MlQnJDLE2NRfMZOu4TrDW9sCLvdf+ucuHFmgCgwtzho81MDv+rfQ7hlYl5/W5cZFYgpUgam46DT0iWopk4Yav3qWlQ9XQa0aclpblxvX4jZCyWkBrnnGFaJFcdUB17y1yHektBiuNfkIj+kt8ttxuGJb5NtxuDpXG5etVDtSWmod4WpXN6VnrZPupWoELlLo1WZMf1c1Ahf5FVTj+ruqEf1d21cD12NltdOR0NpS1xR7VF+Ve0NqdKtyb2jTRLl5aTRR7g1VmhjhDWmi3BvurV2Rzv+2stmR0aoq649Ha4q0O7nKdlYfS2g9ZoSl3ckaO1PanazyRCktnriXtTP5UuC6v4bcYaftp9XCJWeRmGGzvu7volxdr7uFU7WC/vCN7dpjdTuSFkpUI2mhxJ1IWijR2MtG61LUXZjJWj0wUBU7u/boMen5X6v6U+vVNbEExGGGeKChmOgfvdjpbPsSxWGGSHVf4o5fvkT/MENN215Trgou5M9s2W9zHdVLl22YfHGDrst7A6XuoAclPSjr8ejxpXupobhXGuCFoYUS4AJcIMAFAlyACwS4QIBrAQUzXQMuEOACAS7ABQJcIMAFuECACwS4ABcIcIFESZp4HVFQQnOPK2IdtBi4WpNJzMwMSV+mnNH8HIBrCi78Inkl+hXXJBjYS+hQ3CXgapF5NgDXguAi054sH0wmu0oXfZB5HChCvIlSOocTg81xwxPxu+fEf5K95GThuLMan/lGzIEt8PxhTQCTve5CBdjkxoEWrV08yYZrNssHmA6f2YYm4oNbhiLOfKPg41oYFE7yZr4RcyALnAMoV2RYOSQESNCBirW2bK3wGIRWat2mO1UKTsQ2NdlVxKlUuEOkSdwzijnwjA4NwJIzkFdJAZOpUBqKaqikROkmTkA+kIGhid4sYGFcJInh8uXAFuhi4AzzRIa4FA3ixIi3Uio9kxR2i/kwg05u06QxZM+qKa6v82a+UXwTgDFcgRw4ZxXsK0+oQRxbF0cZE0KqS6sXuomiBhIbsJltlsxdFmHsslAD7+1S/8cn2+PO0JcDW8Q/5QGu9K0a3dk6Ky+KAR4ZcE1rM6y48/QCrovHNUVL5tmMixVwFYgLBLhAgAtwgQAXCHABLhDgAgEuwAUCXCDABbgUPM+qICi3uccVsQ6ac1xvkfWlnRr93NDxCtumYruYKjr/Y8PoGPEwUAm4qu01Hy7FRSE/cWmn4a0CrpJxVdsB65qOqwa4ysdFp4bFtPy48MqGrnfoQl/he9u6rpF1tMTH0EPJP11vkP0NfNQKPYt8umcpiopXlnbqvgU+EXAliwzxnN2EFsNF5z6mABrKFllTKhrHpaFKi7FTfLjYIfyTnsU/+VluLqsbOl9UNLCuxLhW6/U1SitkXRv6Kg06dG5RNQ5JgmsDH7PhoqRn0U/vLESN/hSQnTXYYkPXAFfiumu13qa0onGt+OqoCFwKssSGiGtFEfHRszawZ2S5NNiCnAi4koYaq/W3FCku1xlqkbgayFxcXMqWxp1hTXCLIq4K94IUnMZ4bmmAK9Njsi/UqHihhtQZEtfm1l0ktGChRk1hZ234nSFOZgELDkvIosIiGcA1p60arB6D6D9DZHgBbYaAKyuuCxHgWihcIMAFuECACwS4ABeoPMEEeYALBLhAgAtwgQAXCHDBcxeodFww0/Vi4YpYBy0ELsnkP3HzAeEp9LxFQOqum4F7QCCzaXMNsfSuAbj8uN622xlwxSW7k3+JRwjrSaZYdufWawAuEdfbtr46Y1yqocwKl3Il5+yNxoVpic6QzFmt0ImoyayfuyRNmOaap20fsAkm6d7lA30yMVyL8DJoBDJTxBmxyVzYPAN34koDH8su2VsBXBhX236b0RJwsTmrl0w6N+u22aQFHJzmWmEkyIJNc72rtMgEoMsHNYVngA8KZMati82IbfjnySbZqWcNlk4yA1wI0apuv01pCbjYJMh85uOPDM8zudNck0mqPVyBeZMpLnfqZGEa5Y+86eWFOXsbgYmXsTl5mV/NykvqDBEvSisal7Pr4hKmucaTVGfA5ewG6q4kuMC63LprVae0gs4QzyPOfBkNpAPTXONgIuAMvWmuad0lc4aNriHF5V6zibyp5wxZTQZ1V8Rz1wSHCmzOarzVJEWNi8s/zTWZpBoXZdcNNc4aYrinGl4GdLeYmSLOiE3OYNdE+fYOSPaGZ10QGaZv1Ug5f25ui3D/ngA8d2VpM0w73bGa0yS6Lu/ulfxTKTlb5MucnRo/pF31PwgAHSiACwS4QIBr0QRjNQAXCHCBABfgAgEuEOACXCDABQJciykYI7/wuCLWQYuBK8HfCWcD3r3eSjwsimy1dv2j5eHP7RaFi42Rx+MjKg1/MUcMxPZ244EvZNihaoQPAxWAi4+Rb5HxESlx4UE0qr4XHgEDuIrBJYyRZ8PNdpUu/iCD1fAKcXlkgNqeOzCejl8nA5WWzO2D2jL+1+DD5OkodzZ23j15iQ5+A2XDFRgjj8e0NIW/9E5HrzeYy2s5hjgWlI5fJySXrZUuHjbPXlkg497ZwE4+op6efCVHDM4OV2CMPIkkmjRuQEFHQ/B6yOV1O711s+EbDM1IIgqqoRrioHk6bJqP3+YnkzoOlNkZ+sfIY6m7bMz6kiniQv7OWjev9VbCuCo9FdlQz2xE4nJPJkPrAUX2uss3Rr5CBraTcc7s7SAvplCxN7MMJYxrySTjrcmbPaFXfuiIen6yEo4fQZmfu2iUgYevo0qsR60Lb/HnLfxfGBjvksRmg8faCijpKHc+9J2f3ILhntCqcWVwQZvhIuECAS4Q4AJcIMAFAlyACzTvegxFALhAgAsEuAAXCHCBABfgAgEuEOACXCDABQJcgAsEuECAC3CBABcIcAEu0EXiWitZ5Vx3Ea+SDFe7VK2Vct2yr7I7AyXFtVmixIK8RFcBXAuGK29mgAtwAS7ABbgA16XA9Q3gAlyA60JxXTucTCZamottHWrCIl9Bkqsb7qY66VV9yQfa7HBVDyaB7GeIi2ae5H5z4kJXUM+2pfsjley2kuBCGV077LnwtFDy1EslxUV+Xltahu+RABfLPA+ux4lxya5SHq7NrVvbEdnOEFdVls+scPHMS7Iu5CO2Didn29ikNbLaQV6qR5L1Q+yt0D6UQtKvHZBEfCLdew3Pgmhkx1U98K5pbJr4wuxHxC5FbysfLvc3Qb4oveVr9HuYZ9tkZ3ZcPHOvTLyS3J553dVj1Ay1xwEa7IeCPFUVWTp2U2jB03lp0r3Ym8n8aQpc/mt6F2ApvfzWtcWqLXYlesvUFxtsZw5cXuaBkpJmm8+68G8D/yYmva1DZkjUeHh5muQQvMDpXmmyvVH+NDEunLF7TXUy+TWAi1x2RtblXcn7HmznTKxLLKmobHM6w67hXrA7oRfcFHBV3Zsg6TPHhbLxronWqmYAF7nsjOou70oirlvbs6q7xJKKyjZ/qHGN/4C7Bl11nSFBSUycXLxrBJzhre2cuHAu3jVV4nzx91d/9XDhX1TOyFCd0ODNvZKA69qhkS8y5Jm7ZSKU5MxxbXZxGSG7RY7ojDrGHqryqfs1STWP9v2qbZJ0fIbphhq/apt5cB1i18d8VI+a8qRnkyv1aHGa/LbyPneRS1S9Kwnfg33lHM9dNHOvTMSSLLHNMHmoC60ac9DEC7gAF+CCDhTABbgAF+ACXIALcAGuy4GrvGGhMOh6kQZdwysNi/RKAwje7wIBLsAFAlwgwAW4QIALBLgAFwhwgQAX4AIBLhDgAlwgwAUCXFde30ARLLx1Le3oura6tFMTd27oNUV+cC0q2b8vkF/sXr9ULZxvBd2hu6Oi6/pKgm+rNtgFKxq7tySXn1YKoX1pM82Ha0NH32qjluCi+JDE95YZ14YuHMOOX9ppiAesoPtNkGlFwwejjy0t4sjcJS0rktnheyy7YCPpRcrBtaVtaWFcNZHCarJMNzqrylZHE9IXDNc3sh/zinuRDeRlGsQ5NtDm0k5b18kPVO/gOyBOc2mnjneSZHwwcTnkXC18Cs3PPYBeZWlHIwkr9NPNkOaGj8DFTHNil6yixTb+WRFSOAP6K6toayQFZ+Bl1tgi98AuVt1Be1fYt+v4FvrmDj0SX2yTFjz7Bu4iVAriPl+RsC/F97X1FZWsNCQ/sBy4OquK+90a2DNXhHKt4CJoKFt6zf0paatkJz2MuhxUsyCjCJ3i5UcPoFnsUHoVjX9qq/yi7H7YdWhOrBBrxLWpjCgiSzf5vSpeZvhaFfobVBtL7dUWzpt9O3ZTZMFvQaE/APdK7Lr88rJSYPtCRaIIt8N/MN5tz9q6yKraIO6elZH7W68JxULTNuhPGJdvq95ZI/v8p/D8+AG0pNnvUNfoJ8maXZT6QvJf4OQuVlDhu/Ut3eT3qniZCf6polU06lyFm+L35l48+MX8C1kpeJcQzqQ5ig4Sh0Q18bZngEuou1jxouJizjAWFzmM7K2213auEaOQ4nIPEHCtuD8UekrDyw1/a59ZuZcTKrUtjW/Se/Vl5uLa6LSQfXf8NyXcmzJbXCv++myDfgtfXZz/uaviRobUea2Q0hBv2e8MvfJjEdcW9nRtTQmdwvPjB9AsVI25Cu+TX1Rxa6eGBBcPGTdq7CS6uaV53ieAC7HH6yh3iTPUgriQg9UjcQWcYU32C9b8uCrEy9P7zBZ+fCOPnPlzF16r0cca4aYqvJJVVNfdYKfMn37oPYnfkp9C83MPcB3/KrkkvTCpthvusxR96Npy3Rq9JP227IFsiQUIeJOepnqZ+XChfFbpccJNCfemkTMVz3VFW5dXCj5cQpGwHMV9OvlF8euX16qxkeixNHMonFCBGjtrBZ7562Q8Lft9ZsWlZoxEZ4qLx7DyzRK+TrbTctznN5nKM2GbT7G4SD0UuVn418laCpnvE5p4oUUeBLhAcbhoB4q8LlG1cPUi9EuEelSS1EQJG5PjejSK67OYe1yBDhRfSdBHUffBR9Yv4S+5GeBK0u5fXCP4vOMKdqD4vjltQAng8vdLAK5ScbFnP7fZf5Pa0wpvRyRtZVXakEB3C/0SZIv3qIhdEytuhwjvlGnzzoWG2OHQEPtfyBmyPglfJ01MR8hVwOV1oLgdCRyX25lR45YU6JegbX6rvKtB6JqoaJ7xbvAmOl7bsTP83SsVX5Obv0/C30kT2RFydawr1BWAf+leZ4bbR6E3xH4J77xg14TbvcJb5VlAoim+Fmyhe4WfIeuTEDtpYjpCrljd5VYb3M+5nRk+6/L6JeS4KH/aIeLH5fZ3SLtXeBeKrE/C66SJ6Qi5CpGh14ESxCV0Zvhwef0SPly+rgnFDRwbvOOH7xW6JALdK1uBThA3K38njbwj5BIii+lAEbsCxIcuVr6qWJe7/RI+XL6uCaF7Rde97l2h5zHYveKeIeuTEDppojpCrgquxVWB/TqAa/YqsF8HcM1WBffrAC4Q4AJcIMAFAlyACwS4QIALcIEAFwhwAS4Q4AIBLsAFAlygnIIpvAAXCHCBANfi4frmsuqxb+OSSPlvUIzeyHVh9/P/Adkpscd+It03AAAAAElFTkSuQmCC" width="430" height="626" alt="The Antify System Widget settings window with theme, size, opacity, colour and position controls" loading="lazy"></figure>
+      <div class="feat">
+      <div><h3>Themes and looks</h3><p>Choose a theme such as Frost, Ghost, Midnight, Mint, Neon or Sunset. Layout options include Pill, Rings, Mono and Terminal.</p></div>
+      <div><h3>Size, opacity and colour</h3><p>Scale the card with the Size slider, fade it into your wallpaper and pick a preset colour, a gradient or any custom colour.</p></div>
+      <div><h3>Position</h3><p>Drag the card where you want it. Lock it so clicks pass through, then centre or reset it when needed.</p></div>
+      <div><h3>Behaviour</h3><p>Keep it above other apps, hide it in fullscreen apps and start it with Windows.</p></div>
+      <div><h3>Tray and shortcut</h3><p>Open Settings from the tray icon or by right-clicking the card. Press Ctrl+Alt+W to hide or show the widget.</p></div>
+      <div><h3>Defaults in one click</h3><p>Restore every setting with Defaults whenever you want a fresh start.</p></div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <h2>Get started in three steps</h2>
+    <ol class="steps">
+      <li><strong>Download the file</strong><span>Save AntifySystemWidget.exe to your PC.</span></li>
+      <li><strong>Run it and choose</strong><span>Install it with Start menu and Desktop shortcuts, or choose No to just run it without installing.</span></li>
+      <li><strong>Place the card</strong><span>Drag it where you like. Exit or uninstall any time from the tray icon menu.</span></li>
+    </ol>
+    <p class="note">Uninstalling removes the app, its Start menu and Desktop shortcuts, and its saved settings.</p>
+  </div>
+</section>
+
+<section id="details" class="alt">
+  <div class="wrap">
+    <h2>Check it before you run it</h2>
+    <div class="feat" style="margin-bottom:2.5rem">
+      <div><h3>Matching fingerprint</h3><p>Every file has a unique SHA-256 fingerprint. If yours matches the one below, it is the same file listed here.</p></div>
+      <div><h3>No networking code</h3><p>The program’s import list has no networking libraries from Windows, and its own notice says it has no network access.</p></div>
+      <div><h3>Not code-signed</h3><p>The file has no digital signature, so Windows SmartScreen may show an unknown publisher warning. The fingerprint check tells you the file is unchanged.</p></div>
+    </div>
+    <div class="scroll">
+    <table>
+      <tr><th scope="row">Product</th><td>Antify System Widget</td></tr>
+      <tr><th scope="row">Publisher</th><td>Antify</td></tr>
+      <tr><th scope="row">File</th><td>AntifySystemWidget.exe</td></tr>
+      <tr><th scope="row">Size</th><td>129 KB (132,096 bytes)</td></tr>
+      <tr><th scope="row">Platform</th><td>Windows, 64-bit</td></tr>
+      <tr><th scope="row">Privacy</th><td>Works offline, collects no data, needs no admin rights</td></tr>
+      <tr><th scope="row">SHA-256</th><td><code>1dc6a0d1e65e7888abf1ab26dac7c7b8ff2e5a9a215e4cdd477dc55898ccf25b</code></td></tr>
+    </table>
+    </div>
+    <p class="note">To check your copy, open PowerShell in the folder with the file and run:</p>
+    <pre><code>Get-FileHash .\AntifySystemWidget.exe -Algorithm SHA256</code></pre>
+  </div>
+</section>
+
+<section>
+  <div class="wrap credit">
+    <h2>Made by Rajveer Nanadikar</h2>
+    <p>Antify System Widget is designed and built by Rajveer Nanadikar: a small tool that keeps your system load visible without getting in the way.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Antify. Made by Rajveer Nanadikar.</span>
+    <span>For Windows, 64-bit</span>
+  </div>
+</footer>
+</body>
+</html>
